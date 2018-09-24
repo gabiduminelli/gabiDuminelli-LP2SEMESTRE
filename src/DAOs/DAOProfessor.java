@@ -1,0 +1,64 @@
+package DAOs;
+
+import static DAOs.DAOGenerico.em;
+import Entidades.Professor;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+public class DAOProfessor extends DAOGenerico<Professor> {
+
+    private List<Professor> lista = new ArrayList<>();
+
+    public DAOProfessor() {
+        super(Professor.class);
+    }
+
+    
+
+     public List<Professor> listByRaProfessor(int raProfessor) {
+        return em.createQuery("SELECT e FROM Professor e WHERE e.raProfessor = :raProfessor").setParameter("raProfessor", raProfessor).getResultList();
+    }
+
+    public List<Professor> listByDataInicio(String dataInicio) {
+        return em.createQuery("SELECT e FROM Professor e WHERE e.dataInicio LIKE :dataInicio").setParameter("dataInicio", "%" + dataInicio + "%").getResultList();
+    }
+
+    public List<Professor> listInOrderRaProfessor() {
+        return em.createQuery("SELECT e FROM Professor e ORDER BY e.raProfessor").getResultList();
+    }
+
+    public List<Professor> listInOrderDataInicio() {
+        return em.createQuery("SELECT e FROM Professor e ORDER BY e.dataIngressoProfessor").getResultList();
+    }
+
+
+   public List<String> listInOrderNomeStrings(String qualOrdem) {
+        List<Professor> lf;
+        if (qualOrdem.equals("raProfessor")) {
+            lf = listInOrderRaProfessor();
+        } else {
+            lf = listInOrderDataInicio();
+        }
+
+        
+        List<String> ls = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        for (int i = 0; i < lf.size(); i++) {
+            ls.add(lf.get(i).getRaProfessor() + ";" 
+                    + sdf.format(lf.get(i).getDataIngressoProfessor()) 
+                    ////////////////////////////aula
+                    + ";" + lf.get(i).getPessoaCpf()+";");
+        }
+        return ls;
+    }
+
+    public static void main(String[] args) {
+        DAOProfessor daoProfessor = new DAOProfessor();
+        List<Professor> listaProfessor = daoProfessor.list();
+        for (Professor professor : listaProfessor) {
+            System.out.println(professor.getRaProfessor() + "-" + professor.getDataIngressoProfessor()+"-" + professor.getPessoaCpf());
+        }
+    }
+}
